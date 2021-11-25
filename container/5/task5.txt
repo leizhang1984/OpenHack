@@ -1,0 +1,60 @@
+cd '/mnt/d/Program Files/Desktop/OpenHack/leizha/4'
+
+https://github.com/Azure/secrets-store-csi-driver-provider-azure/blob/master/examples/keyvault-secrets/v1alpha1_secretproviderclass_secrets.yaml
+
+
+
+az aks get-credentials --name teamAKS02 --resource-group teamResources --admin --overwrite
+
+az aks enable-addons --addons azure-keyvault-secrets-provider --name teamAKS02 --resource-group teamResources
+
+kubectl get pods -n kube-system -l 'app in (secrets-store-csi-driver, secrets-store-provider-azure)'
+
+az vmss identity show -g 'MC_teamResources_teamAKS02_eastasia' -n 'aks-agentpool-27958874-vmss' -o yaml
+
+
+
+
+az aks show --name teamAKS02 --resource-group teamResources --query identityProfile.kubeletidentity.clientId -o tsv
+#   cc418a6a-2773-41dd-8f3e-e7d06e307927
+
+# set policy to access keys in your key vault
+az keyvault set-policy -n vault1-hacker66-ea --key-permissions get --spn cc418a6a-2773-41dd-8f3e-e7d06e307927
+
+# set policy to access secrets in your key vault
+az keyvault set-policy -n vault1-hacker66-ea --secret-permissions get --spn cc418a6a-2773-41dd-8f3e-e7d06e307927
+
+# set policy to access certs in your key vault
+az keyvault set-policy -n vault1-hacker66-ea --certificate-permissions get --spn cc418a6a-2773-41dd-8f3e-e7d06e307927
+
+
+kubectl exec busybox-secrets-store-inline-user-msi -- ls /mnt/secrets-store/
+
+kubectl exec busybox-secrets-store-inline-user-msi -- cat /mnt/secrets-store/username
+kubectl exec busybox-secrets-store-inline-user-msi -- cat /mnt/secrets-store/password
+kubectl exec busybox-secrets-store-inline-user-msi -- cat /mnt/secrets-store/sqlserver
+kubectl exec busybox-secrets-store-inline-user-msi -- cat /mnt/secrets-store/dbname
+
+
+kubectl exec busybox-secrets-store-inline-user-msi-v2 -- env
+
+
+
+
+
+kubectl create secret generic kvcreds --from-literal clientid=1aa3333e-4252-4641-a650-818084b0780f --from-literal clientsecret=jYW7Q~oXK-BV_qbOF9Rkoir3OxoF0SZ~o89I- --type=azure/kv
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

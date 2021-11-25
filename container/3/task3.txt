@@ -1,0 +1,56 @@
+az cloud set --name AzureCloud
+az login
+az account set --subscription 940a4437-eda8-4921-b571-320b4daed23d
+az aks get-credentials --resource-group teamResources --name teamAKs
+
+
+az aks update -n test1 -g OH6992 --attach-acr registrycfl5818
+
+kubectl create ns api
+
+kubectl create secret generic sql -n api  \
+    --from-literal=username=sqladmincFl5818 \
+    --from-literal=password=kO6fo9Rv4 \
+    --from-literal=sqlserver=sqlservercfl5818.database.windows.net \
+    --from-literal=dbname=mydrivingDB
+
+
+kubectl exec -it poi-deployment-7c66f4cbdb-wl549 -n api -- sh
+curl http://localhost:80/api/poi
+
+
+kubectl exec -it user-java-deployment-87f659b64-dthcx -n api -- sh
+curl http://localhost:80/api/user-java/healthcheck
+
+
+kubectl exec -it mydrive-user-deployment-584c6f9ccb-4w77w -n api -- sh
+
+
+
+
+kubectl exec -it tripviewer-deploy-85c77b9f69-8vtps -n api -- sh
+
+
+
+
+
+
+
+
+
+cd '/mnt/d/Program Files/Desktop/OpenHack/leizha/3'
+
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secret-test-pod
+spec:
+  containers:
+    - name: test-container
+      image: k8s.gcr.io/busybox
+      command: [ "/bin/sh", "-c", "env" ]
+      envFrom:
+      - secretRef:
+          name: mysecret

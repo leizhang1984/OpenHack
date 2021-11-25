@@ -1,0 +1,11 @@
+cd '/mnt/d/Program Files/Desktop/OpenHack/leizha/4'
+
+az login
+
+az aks get-credentials --name teamAKS02 --resource-group teamResources --admin --overwrite
+
+
+az aks get-credentials --name teamAKS02 --resource-group teamResources --overwrite
+
+
+kubectl auth can-i delete pod -n web --as

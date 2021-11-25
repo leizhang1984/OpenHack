@@ -1,0 +1,43 @@
+# Pared down version of POI yaml with KeyVault FlexVol spec for example purposes
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: poi
+      version: "1.0"
+  template:
+    metadata:
+      labels:
+        app: poi
+        version: "1.0"
+    spec:
+      containers:
+      - name: poi
+        image: "registrycfl5818.azurecr.io/tripinsights/poi:1.0"
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+          name: http
+        volumeMounts:
+        - name: keyvault
+          mountPath: /secrets
+          readOnly: true
+      volumes:
+      - name: keyvault
+        flexVolume:
+          driver: "azure/kv"
+          secretRef:
+            name: kvcreds
+          options:
+            keyvaultname: "vault1-hacker66-ea"
+            keyvaultobjectnames: "username;password;sqlserver"
+            keyvaultobjecttypes: "secret;secret;secret"
+            keyvaultobjectaliases: "SQL_USER;SQL_PASSWORD;SQL_SERVER"
+            resourcegroup: "teamResources"
+            subscriptionid: "940a4437-eda8-4921-b571-320b4daed23d"
+            tenantid: "17d9665a-11eb-4ef1-a76f-996b76dfdb78"
+---

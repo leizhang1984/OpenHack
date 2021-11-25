@@ -1,0 +1,27 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: apirolebinding
+  namespace: api
+roleRef:
+  kind: Role
+  name: apirole
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: Group
+  name: "94de8290-e8cd-4de7-85a5-69d67fd7007e"
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: webrolebinding
+  namespace: web
+roleRef:
+  kind: Role
+  name: webrole
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: Group
+  name: "94de8290-e8cd-4de7-85a5-69d67fd7007e"
+  apiGroup: rbac.authorization.k8s.io
