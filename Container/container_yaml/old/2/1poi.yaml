@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poi-deployment
+  namespace: api
+  labels:
+    deploy: poi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: poi
+  template:
+    metadata:
+      labels:
+        app: poi
+    spec:
+      containers:
+      - image: "registryrkm0658.azurecr.io/poi:1.0"
+        imagePullPolicy: Always
+        name: poi
+        livenessProbe:
+          httpGet:
+            path: /api/poi/healthcheck
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /api/poi/healthcheck
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        ports:
+          - containerPort: 80
+            name: http
+            protocol: TCP
+          - containerPort: 443
+            name: https
+            protocol: TCP
+        env:
+          - name: SQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: sqlsecret
+                key: SQL_USER
+                optional: false
+          - name: SQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: sqlsecret
+                key: SQL_PASSWORD
+                optional: false
+          - name: SQL_SERVER
+            valueFrom:
+              secretKeyRef:
+                name: sqlsecret
+                key: SQL_SERVER
+                optional: false
+          - name: SQL_DBNAME
+            valueFrom:
+              secretKeyRef:
+                name: sqlsecret
+                key: SQL_DBNAME
+                optional: false
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: poi
+  namespace: api
+spec:
+  type: ClusterIP
+  selector:
+    app: poi
+  ports:
+    - protocol: TCP
+      name: poi-http
+      port: 80
+      targetPort: 80
+    - protocol: TCP
+      name: poi-https
+      port: 443
+      targetPort: 443

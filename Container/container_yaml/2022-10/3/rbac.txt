@@ -1,0 +1,53 @@
+
+#先清理之前创建的role和rolebinding
+kubectl get rolebingding --all-namespaces
+kubectl delete role web-user-full-access -n web
+
+kubectl get rolebinding --all-namespaces
+kubectl delete rolebinding web-user-access -n web
+
+#登录
+az aks get-credentials --resource-group leizha-rg --name aks01 --admin
+
+AKS_ID=$(az aks show \
+    --resource-group leizha-rg \
+    --name aks01 \
+    --query id -o tsv)
+
+#先创建web group
+webgroup_id=$(az ad group create --display-name webgroup --mail-nickname webgroup --query objectId -o tsv)
+webgroup_id="076c2ac5-cf30-42e8-9c9d-7450fa48f4eb"
+
+
+#再创建web user
+webuser_id=$(az ad user create  --display-name "web user" \
+  --user-principal-name "webuser@msftopenhack6889ops.onmicrosoft.com" \
+  --password "Abcdefg@123456" \
+  --query objectId -o tsv)
+webuser_id="6452c5e2-0baf-47b4-9b0c-d6f7d016a3a3"
+
+az role assignment create \
+  --assignee $webgroup_id \
+  --role "Azure Kubernetes Service Cluster User Role" \
+  --scope $AKS_ID
+
+#把web user加入到web group
+az ad group member add --group webgroup --member-id $webuser_id
+
+
+#设置Role和Role Binding
+#进入到目录：/mnt/d/work/github/openhack/container/container_yaml/2022-10/3
+
+kubectl apply -f role-web.yaml
+kubectl apply -f role-api-limited.yaml
+
+kubectl apply -f bind-role-web-dev-group.yaml
+##########################################
+##########################################
+##########################################
+az login
+
+az aks get-credentials --resource-group leizha-rg --name aks01 --overwrite-existing
+kubectl get pod -n api
+　　
+

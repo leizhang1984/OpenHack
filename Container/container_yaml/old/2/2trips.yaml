@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trip-deployment
+  namespace: api
+  labels:
+    deploy: trips
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trips
+  template:
+    metadata:
+      labels:
+        app: trips
+    spec:
+      containers:
+      - image: "registryrkm0658.azurecr.io/trips:1.0"
+        imagePullPolicy: Always
+        name: trips
+        livenessProbe:
+          httpGet:
+            path: /api/trips/healthcheck
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /api/trips/healthcheck
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        ports:
+          - containerPort: 80
+            name: http
+            protocol: TCP
+          - containerPort: 443
+            name: https
+            protocol: TCP
+        env:
+          - name: SQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: sqlsecret
+                key: SQL_USER
+                optional: false
+          - name: SQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: sqlsecret
+                key: SQL_PASSWORD
+                optional: false
+          - name: SQL_SERVER
+            valueFrom:
+              secretKeyRef:
+                name: sqlsecret
+                key: SQL_SERVER
+                optional: false
+          - name: SQL_DBNAME
+            valueFrom:
+              secretKeyRef:
+                name: sqlsecret
+                key: SQL_DBNAME
+                optional: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trips
+  namespace: api
+spec:
+  type: ClusterIP
+  selector:
+    app: trips
+  ports:
+    - protocol: TCP
+      name: trips-http
+      port: 80
+      targetPort: 80
+    - protocol: TCP
+      name: trips-https
+      port: 443
+      targetPort: 443

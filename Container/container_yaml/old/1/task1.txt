@@ -1,0 +1,11 @@
+docker network create openhacknetwork
+
+docker run --network openhacknetwork -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=localtest@ABCEFG123" -p 1433:1433 --name sql -d mcr.microsoft.com/mssql/server:2017-latest
+
+docker exec sql /opt/mssql-tools/bin/sqlcmd   -S localhost -U SA -P localtest@ABCEFG123   -Q "CREATE DATABASE mydrivingDB"
+
+docker run -d --network openhacknetwork  -p 8080:80  --name poi  -e "SQL_PASSWORD= localtest@ABCEFG123"  -e "SQL_SERVER=sql" -e "SQL_USER=sa" -e "ASPNETCORE_ENVIRONMENT=Local"  tripinsights/poi:1.0
+
+
+
+docker build -f Dockerfile -t tripinsights/poi:1.0 .

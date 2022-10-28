@@ -1,0 +1,41 @@
+/mnt/d/work/github/openhack/container/container_yaml/2
+
+docker build -f Dockerfile -t tripinsights/poi:1.0 .
+
+docker build -f Dockerfile_2 -t userprofile:1.0 .
+
+docker login registryrkm0658.azurecr.io
+registryrkm0658
+EcL1ItZ/OUzzXZKkTC7QmuyREKQxKwb8
+
+
+docker tag userprofile:1.0  registryrkm0658.azurecr.io/user-java:1.0
+docker push registryrkm0658.azurecr.io/user-java:1.0
+
+
+docker build -f Dockerfile_3 -t poi:1.0 .
+docker tag poi:1.0  registryrkm0658.azurecr.io/poi:1.0
+docker push registryrkm0658.azurecr.io/poi:1.0
+
+
+docker build -f Dockerfile_0 -t user-java:1.0 .
+docker tag user-java:1.0  registryrkm0658.azurecr.io/user-java:1.0
+docker push registryrkm0658.azurecr.io/user-java:1.0
+
+
+sqlserverrkm0658.database.windows.net
+sqladminrKm0658
+qT3td7Do8
+
+#######################################################################
+cd /mnt/d/work/github/openhack/container/container_yaml/2
+
+az cloud set --name AzureCloud
+az aks get-credentials -n aks01 -g leizha-rg
+
+kubectl apply -f sql-secret.yaml
+
+echo -n "sqladminrKm0658" | base64
+echo -n "qT3td7Do8" | base64
+echo -n "sqlserverrkm0658.database.windows.net" | base64
+echo -n "mydrivingDB" | base64

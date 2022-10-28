@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: userprofile-deployment
+  namespace: api
+  labels:
+    deploy: userprofile
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: userprofile
+  template:
+    metadata:
+      labels:
+        app: userprofile
+    spec:
+      containers:
+      - image: "registryrkm0658.azurecr.io/userprofile:1.0"
+        imagePullPolicy: Always
+        name: userprofile
+        livenessProbe:
+          httpGet:
+            path: /api/user/healthcheck
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /api/user/healthcheck
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        ports:
+          - containerPort: 80
+            name: http
+            protocol: TCP
+          - containerPort: 443
+            name: https
+            protocol: TCP
+        env:
+          - name: SQL_USER
+            value: "sqladminrKm0658"
+          - name: SQL_PASSWORD
+            value: "qT3td7Do8"
+          - name: SQL_SERVER
+            value: "sqlserverrkm0658.database.windows.net"
+          - name: SQL_DBNAME
+            value: "mydrivingDB"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: userprofile
+  namespace: api
+spec:
+  type: ClusterIP
+  selector:
+    app: userprofile
+  ports:
+    - protocol: TCP
+      name: userprofile-http
+      port: 80
+      targetPort: 80
+    - protocol: TCP
+      name: userprofile-https
+      port: 443
+      targetPort: 443
